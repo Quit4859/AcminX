@@ -1,0 +1,85 @@
+import { GoogleGenAI, Type } from "@google/genai";
+import { GeneratedCode, Message } from "../types";
+
+const SYSTEM_INSTRUCTION = `You are an elite software architect and senior frontend engineer. 
+Your goal is to build flawless, production-ready, standalone web applications based on user prompts.
+
+### EXECUTION PROCESS:
+1. ANALYZE: Carefully parse the user's request, identifying all functional and non-functional requirements.
+2. PLAN: Mentally architect the application structure, state management, and UI components.
+3. VERIFY: Check for logic flaws, edge cases (e.g., empty states, mobile responsiveness), and accessibility.
+4. GENERATE: Produce the final, optimized code.
+
+### TECHNICAL CONSTRAINTS:
+- Output MUST be a SINGLE, COMPLETELY STANDALONE HTML file.
+- Use <!DOCTYPE html>, <html>, <head>, and <body> tags.
+- STYLING: Exclusively use Tailwind CSS via CDN: <script src="https://cdn.tailwindcss.com"></script>.
+- ICONS: Use Lucide icons: <script src="https://unpkg.com/lucide@latest"></script>. Initialize with lucide.createIcons() at the bottom of the body.
+- LOGIC: All JavaScript must be inside a <script> tag. No external JS files.
+- ASSETS: Use high-quality placeholder images (e.g., Unsplash) if needed.
+- AESTHETICS: Modern dark-mode, glassmorphism, smooth animations (CSS transitions/keyframes), and professional typography (Inter/system-ui).
+
+### OUTPUT FORMAT:
+You MUST return a valid JSON object matching this schema:
+{
+  "html": "The full string content of the HTML file.",
+  "explanation": "A concise summary of the architecture and features."
+}`;
+
+export const generateAppCode = async (prompt: string, history: Message[], model: string = "gemini-3-pro-preview"): Promise<GeneratedCode> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  
+  try {
+    const isThinkingModel = model.includes('gemini-3') || model.includes('gemini-2.5');
+    
+    const response = await ai.models.generateContent({
+      model: model, 
+      contents: [
+        ...history.map(m => ({ 
+          role: m.role === 'assistant' ? 'model' : m.role === 'system' ? 'user' : 'user', 
+          parts: [{ text: m.content }] 
+        })),
+        { role: 'user', parts: [{ text: prompt }] }
+      ],
+      config: {
+        systemInstruction: SYSTEM_INSTRUCTION,
+        responseMimeType: "application/json",
+        // Enable reasoning/thinking budget for models that support it to satisfy 
+        // the "check logic and fix problems before output" requirement.
+        ...(isThinkingModel ? { thinkingConfig: { thinkingBudget: 16000 } } : {}),
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            html: { type: Type.STRING },
+            explanation: { type: Type.STRING }
+          },
+          required: ["html", "explanation"]
+        }
+      }
+    });
+
+    const text = response.text;
+    if (!text) {
+      throw new Error("The AI returned an empty response.");
+    }
+    
+    const result = JSON.parse(text);
+    if (!result.html) {
+      throw new Error("Failed to extract HTML from the AI response.");
+    }
+    
+    return result as GeneratedCode;
+  } catch (error: any) {
+    console.error("Gemini Generation Error:", error);
+    
+    if (error?.message?.includes("429") || error?.message?.includes("RESOURCE_EXHAUSTED")) {
+      throw new Error("You’ve reached your usage limit. Please wait 10 minutes before trying again");
+    }
+
+    if (error?.message?.includes("500") || error?.message?.includes("Rpc failed")) {
+      throw new Error("The AI service is experiencing heavy load. Please try again in a few seconds.");
+    }
+    
+    throw new Error(error.message || "An unexpected error occurred during generation.");
+  }
+};

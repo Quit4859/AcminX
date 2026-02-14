@@ -1,0 +1,8 @@
+{
+  "name": "AcminX ",
+  "description": "An open-source AI app builder that turns natural language into functional React/Tailwind components using Gemini 3 Pro and Firecrawl-inspired data fetching concepts.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
