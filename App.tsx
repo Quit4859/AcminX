@@ -25,9 +25,7 @@ const MODELS = [
 
 const PROMPT_TEMPLATES: Record<string, string> = {
   'Create Website': `Create a modern, responsive demo website with a clean and professional design that includes a navigation bar, hero section, about section, services section, and contact form, features smooth scrolling and basic animations, is fully responsive across desktop and mobile devices, uses consistent typography and color styling, and includes well-structured, semantic HTML, organized CSS, and clean JavaScript for interactivity.`,
-  
   'Snake Game': `Create a fully functional Snake game where the player controls the snake using the WASD keys, the snake moves continuously across a grid, food appears randomly and causes the snake to grow and increase the score when eaten, the game ends if the snake collides with itself (and optionally the wall), a Game Over message and final score are displayed, and a restart button resets the game state, all presented with a clean, modern, and responsive design.`,
-  
   'Modern Calculator': `Create a fully functional calculator application with a clean, modern, and responsive design that allows users to perform basic arithmetic operations (addition, subtraction, multiplication, and division), supports keyboard and button input, displays the current input and result clearly, handles errors such as division by zero gracefully, and includes a clear/reset button to restart the calculation.`
 };
 
@@ -145,6 +143,10 @@ const App: React.FC = () => {
     }
   }, [history, hasStarted]);
 
+  const handleComingSoon = () => {
+    alert("Coming Soon! We are currently in private beta. Stay tuned for our public launch.");
+  };
+
   const handleGenerate = async (e?: React.FormEvent, overridePrompt?: string) => {
     if (e) e.preventDefault();
     const finalPrompt = overridePrompt || prompt;
@@ -218,8 +220,8 @@ const App: React.FC = () => {
 
           <div className="flex items-center gap-2 md:gap-4">
             <div className="hidden sm:flex items-center gap-2 md:gap-4">
-              <button className="text-sm font-semibold text-gray-400 hover:text-white transition-all px-4 py-2 rounded-lg hover:bg-white/5">Sign In</button>
-              <button className="text-sm font-bold bg-white text-black px-6 py-2.5 rounded-xl hover:bg-gray-200 transition-all active:scale-95 shadow-lg shadow-white/10">Sign Up</button>
+              <button onClick={handleComingSoon} className="text-sm font-semibold text-gray-400 hover:text-white transition-all px-4 py-2 rounded-lg hover:bg-white/5">Sign In</button>
+              <button onClick={handleComingSoon} className="text-sm font-bold bg-white text-black px-6 py-2.5 rounded-xl hover:bg-gray-200 transition-all active:scale-95 shadow-lg shadow-white/10">Sign Up</button>
             </div>
             
             <button 
@@ -237,7 +239,7 @@ const App: React.FC = () => {
              {navLinks.map(link => (
                 <button key={link} onClick={() => handleNavClick(link)} className="text-2xl font-black text-left py-4 border-b border-white/5">{link}</button>
              ))}
-             <button className="w-full py-4 rounded-xl bg-white text-black font-bold mt-4">Sign Up</button>
+             <button onClick={handleComingSoon} className="w-full py-4 rounded-xl bg-white text-black font-bold mt-4">Sign Up</button>
           </div>
         )}
 
@@ -381,7 +383,7 @@ const App: React.FC = () => {
                         <li key={f} className="flex items-center gap-3 text-sm text-gray-400"><svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"/></svg>{f}</li>
                       ))}
                    </ul>
-                   <button disabled className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold opacity-50 cursor-not-allowed">Coming Soon</button>
+                   <button onClick={handleComingSoon} className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-all">Sign Up Free</button>
                 </div>
 
                 {/* Pro tier */}
@@ -395,7 +397,7 @@ const App: React.FC = () => {
                         <li key={f} className="flex items-center gap-3 text-sm text-gray-700 font-medium"><svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"/></svg>{f}</li>
                       ))}
                    </ul>
-                   <button disabled className="w-full py-4 rounded-2xl bg-black/5 border border-black/10 text-black font-bold opacity-50 cursor-not-allowed">Coming Soon</button>
+                   <button onClick={handleComingSoon} className="w-full py-4 rounded-2xl bg-black text-white font-bold hover:bg-black/90 transition-all shadow-xl">Get Pro</button>
                 </div>
 
                 {/* Team */}
@@ -542,6 +544,7 @@ const App: React.FC = () => {
             <div className="text-[11px] font-black text-gray-500 bg-white/[0.04] px-5 py-2 rounded-xl border border-white/10 font-mono tracking-[0.2em] uppercase">
               ENGINE: <span className="text-white">{selectedModel.name}</span>
             </div>
+            <button onClick={handleComingSoon} className="px-5 py-2.5 bg-white text-black text-xs font-black rounded-xl hover:bg-gray-200 transition-all active:scale-95">SIGN UP</button>
           </div>
         </div>
 
