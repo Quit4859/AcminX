@@ -1,24 +1,8 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { GeneratedCode, Message } from "../types";
 
 const SYSTEM_INSTRUCTION = `You are an elite software architect and senior frontend engineer. 
 Your goal is to build flawless, production-ready, standalone web applications based on user prompts.
-
-### EXECUTION PROCESS:
-1. ANALYZE: Carefully parse the user's request, identifying all functional and non-functional requirements.
-2. PLAN: Mentally architect the application structure, state management, and UI components.
-3. VERIFY: Check for logic flaws, edge cases (e.g., empty states, mobile responsiveness), and accessibility.
-4. GENERATE: Produce the final, optimized code.
-
-### TECHNICAL CONSTRAINTS:
-- Output MUST be a SINGLE, COMPLETELY STANDALONE HTML file.
-- Use <!DOCTYPE html>, <html>, <head>, and <body> tags.
-- STYLING: Exclusively use Tailwind CSS via CDN: <script src="https://cdn.tailwindcss.com"></script>.
-- ICONS: Use Lucide icons: <script src="https://unpkg.com/lucide@latest"></script>. Initialize with lucide.createIcons() at the bottom of the body.
-- LOGIC: All JavaScript must be inside a <script> tag. No external JS files.
-- ASSETS: Use high-quality placeholder images (e.g., Unsplash) if needed.
-- AESTHETICS: Modern dark-mode, glassmorphism, smooth animations (CSS transitions/keyframes), and professional typography (Inter/system-ui).
 
 ### OUTPUT FORMAT:
 You MUST return a valid JSON object matching this schema:
@@ -28,8 +12,16 @@ You MUST return a valid JSON object matching this schema:
 }`;
 
 export const generateAppCode = async (prompt: string, history: Message[], model: string = "gemini-3-pro-preview"): Promise<GeneratedCode> => {
-  // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  // Use the API key exclusively from process.env.API_KEY.
+  // In this environment, it is populated after window.aistudio.openSelectKey() is called.
+  const apiKey = process.env.API_KEY;
+
+  if (!apiKey) {
+    throw new Error("Gemini API Key is missing. Please click 'Configure API Key' to set up your paid project credentials.");
+  }
+
+  // Always create a new instance right before the call to ensure the latest key is used.
+  const ai = new GoogleGenAI({ apiKey });
   
   try {
     const isThinkingModel = model.includes('gemini-3') || model.includes('gemini-2.5');
@@ -46,7 +38,6 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         responseMimeType: "application/json",
-        // Only set thinkingBudget for supported Gemini 3/2.5 models
         ...(isThinkingModel ? { thinkingConfig: { thinkingBudget: 16000 } } : {}),
         responseSchema: {
           type: Type.OBJECT,
@@ -59,34 +50,23 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
       }
     });
 
-    // Access the .text property directly as per GenAI guidelines
     const text = response.text;
     if (!text) {
-      throw new Error("The AI returned an empty response.");
+      throw new Error("Empty response from AI engine.");
     }
     
-    const result = JSON.parse(text);
-    if (!result.html) {
-      throw new Error("Failed to extract HTML from the AI response.");
-    }
-    
-    return result as GeneratedCode;
+    return JSON.parse(text) as GeneratedCode;
   } catch (error: any) {
-    console.error("Gemini Generation Error:", error);
+    console.error("Gemini Error:", error);
     
-    // Explicitly handle API key errors with helpful guidance
-    if (error?.message?.includes("API key not valid") || error?.message?.includes("key must be set")) {
-      throw new Error("API Key Error: Please ensure process.env.API_KEY is correctly configured in your deployment environment.");
+    if (error?.message?.includes("API key not valid") || error?.message?.includes("An API Key must be set")) {
+      throw new Error("Your API Key is invalid or expired. Please re-configure it via the Settings.");
     }
 
-    if (error?.message?.includes("429") || error?.message?.includes("RESOURCE_EXHAUSTED")) {
-      throw new Error("Rate limit exceeded. Please wait a moment before trying again.");
-    }
-
-    if (error?.message?.includes("500") || error?.message?.includes("Rpc failed")) {
-      throw new Error("The Gemini service is currently under high load. Please retry in a few seconds.");
+    if (error?.message?.includes("Requested entity was not found")) {
+      throw new Error("Requested entity was not found. This often means your API key project is not linked to Gemini models. Please re-select a paid project key.");
     }
     
-    throw new Error(error.message || "An unexpected error occurred during generation.");
+    throw new Error(error.message || "An unexpected error occurred during code generation.");
   }
 };
