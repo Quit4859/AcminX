@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { GeneratedCode, Message } from "../types";
 
@@ -78,9 +77,10 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
     
     // Explicitly handle API key errors and rename as requested by user
     if (
-      msg.includes("API key not valid") || 
+      msg.toLowerCase().includes("api key must be set") || 
       msg.includes("key must be set") || 
-      msg.includes("API Key must be set")
+      msg.includes("API key not valid") ||
+      msg.includes("API_KEY")
     ) {
       throw new Error("this is under Development");
     }

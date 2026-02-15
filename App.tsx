@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Message, GeneratedCode } from './types';
 import { generateAppCode } from './services/gemini';
@@ -145,7 +144,7 @@ const App: React.FC = () => {
   }, [history, hasStarted]);
 
   const handleComingSoon = () => {
-    alert("this is under Development");
+    alert("Coming Soon! We are currently in private beta. Stay tuned for our public launch.");
   };
 
   const handleGenerate = async (e?: React.FormEvent, overridePrompt?: string) => {
@@ -365,7 +364,7 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* Pricing Section */}
+        {/* Pricing Section - v0 style */}
         <section ref={pricingRef} className="flex-shrink-0 px-6 md:px-8 py-32 md:py-40 bg-[#0a0a0a] border-t border-white/5">
           <div className="max-w-7xl mx-auto">
              <div className="text-center mb-24">
@@ -411,13 +410,13 @@ const App: React.FC = () => {
                         <li key={f} className="flex items-center gap-3 text-sm text-gray-400"><svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"/></svg>{f}</li>
                       ))}
                    </ul>
-                   <button onClick={handleComingSoon} className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-all">Contact Sales</button>
+                   <button className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-all">Contact Sales</button>
                 </div>
              </div>
           </div>
         </section>
 
-        {/* FAQ Section */}
+        {/* FAQ Section - v0 style */}
         <section ref={faqRef} className="flex-shrink-0 px-6 md:px-8 py-32 md:py-40 bg-[#0a0a0a] border-t border-white/5">
           <div className="max-w-3xl mx-auto">
              <div className="text-center mb-20">
@@ -546,7 +545,7 @@ const App: React.FC = () => {
             <div className="text-[11px] font-black text-gray-500 bg-white/[0.04] px-5 py-2 rounded-xl border border-white/10 font-mono tracking-[0.2em] uppercase">
               ENGINE: <span className="text-white">{selectedModel.name}</span>
             </div>
-            <button onClick={handleComingSoon} className="px-5 py-2.5 bg-white text-black text-xs font-black rounded-xl hover:bg-gray-200 transition-all active:scale-95 uppercase">this is under Development</button>
+            <button onClick={handleComingSoon} className="px-5 py-2.5 bg-white text-black text-xs font-black rounded-xl hover:bg-gray-200 transition-all active:scale-95">SIGN UP</button>
           </div>
         </div>
 
