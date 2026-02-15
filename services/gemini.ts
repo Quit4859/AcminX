@@ -27,7 +27,20 @@ You MUST return a valid JSON object matching this schema:
 }`;
 
 export const generateAppCode = async (prompt: string, history: Message[], model: string = "gemini-3-pro-preview"): Promise<GeneratedCode> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  // Safe environment key access
+  const envKey = (typeof process !== 'undefined' && process.env?.API_KEY) || '';
+  
+  // Also check localStorage as a fallback if the user entered it in the UI
+  let apiKey = envKey;
+  if (!apiKey) {
+    try {
+      const saved = localStorage.getItem('acminx_api_keys');
+      const keys = saved ? JSON.parse(saved) : {};
+      if (keys.google) apiKey = keys.google;
+    } catch (e) {}
+  }
+
+  const ai = new GoogleGenAI({ apiKey: apiKey });
   
   try {
     const isThinkingModel = model.includes('gemini-3') || model.includes('gemini-2.5');
