@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { GeneratedCode, Message } from "../types";
 
@@ -74,9 +73,9 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
   } catch (error: any) {
     console.error("Gemini Generation Error:", error);
     
-    // Explicitly handle API key errors with helpful guidance
-    if (error?.message?.includes("API key not valid") || error?.message?.includes("key must be set")) {
-      throw new Error("API Key Error: Please ensure process.env.API_KEY is correctly configured in your deployment environment.");
+    // Explicitly handle API key errors with the requested message
+    if (error?.message?.includes("API key not valid") || error?.message?.includes("key must be set") || error?.message?.includes("API_KEY")) {
+      throw new Error("this is under developement");
     }
 
     if (error?.message?.includes("429") || error?.message?.includes("RESOURCE_EXHAUSTED")) {

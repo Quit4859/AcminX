@@ -222,31 +222,17 @@ const App: React.FC = () => {
             <div className="hidden sm:flex items-center gap-2 md:gap-4">
               <button onClick={handleComingSoon} className="text-sm font-semibold text-gray-400 hover:text-white transition-all px-4 py-2 rounded-lg hover:bg-white/5">Sign In</button>
               <button onClick={handleComingSoon} className="text-sm font-bold bg-white text-black px-6 py-2.5 rounded-xl hover:bg-gray-200 transition-all active:scale-95 shadow-lg shadow-white/10">Sign Up</button>
+              <button onClick={handleComingSoon} className="p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-all">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </button>
             </div>
-            
-            <button 
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2.5 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-all"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"/></svg>
-            </button>
           </div>
         </nav>
-
-        {/* Mobile Menu Overlay */}
-        {isMobileMenuOpen && (
-          <div className="fixed inset-0 z-[90] bg-black pt-24 px-6 flex flex-col gap-6 lg:hidden animate-in fade-in duration-300">
-             {navLinks.map(link => (
-                <button key={link} onClick={() => handleNavClick(link)} className="text-2xl font-black text-left py-4 border-b border-white/5">{link}</button>
-             ))}
-             <button onClick={handleComingSoon} className="w-full py-4 rounded-xl bg-white text-black font-bold mt-4">Sign Up</button>
-          </div>
-        )}
 
         {/* Hero Section */}
         <main className="flex-shrink-0 flex flex-col items-center justify-center px-6 pt-24 pb-32 relative min-h-[85vh] overflow-hidden">
            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
-             <BrandLogo className="w-[80vw] h-auto opacity-[0.03] transform -translate-y-12 rotate-[-5deg] scale-125" />
+             <BrandLogo className="w-[80vw] h-auto opacity-[0.05] transform -translate-y-12 rotate-[-5deg] scale-125" />
            </div>
            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] bg-gradient-to-b from-white/[0.05] to-transparent rounded-full blur-[120px] pointer-events-none z-0" />
            <div className="absolute bottom-0 left-0 w-full h-[60%] bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none z-1" />
@@ -254,13 +240,13 @@ const App: React.FC = () => {
            <div className="mb-14 relative z-10">
               <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-xl hover:bg-white/[0.08] transition-colors cursor-default">
                 <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.8)] animate-pulse" />
-                <span className="text-[13px] font-semibold text-gray-300 tracking-wide">Now powered by {selectedModel.name}</span>
+                <span className="text-[13px] font-semibold text-gray-300 tracking-wide">Now powered by AcminX-Logic</span>
               </div>
            </div>
 
           <h1 className="text-5xl md:text-7xl lg:text-[7.5rem] font-black mb-8 tracking-tighter text-center max-w-5xl leading-[0.85] flex flex-col items-center relative z-10 select-none">
-            <span className="bg-gradient-to-t from-[#111] via-white to-white bg-clip-text text-transparent">Build Anything</span>
-            <span className="mt-2 block bg-gradient-to-t from-[#111] via-white to-white bg-clip-text text-transparent" style={{ filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.4))' }}>Instantly.</span>
+            <span className="text-white drop-shadow-2xl">Build Anything</span>
+            <span className="mt-2 block text-white/90 drop-shadow-2xl">Instantly.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-gray-400 text-center max-w-2xl mb-16 leading-relaxed font-medium mt-4 relative z-10">
@@ -301,9 +287,14 @@ const App: React.FC = () => {
                     </div>
                   )}
                 </div>
-                <button type="submit" disabled={!prompt.trim()} className="p-4 rounded-2xl bg-white text-black hover:bg-white/90 disabled:bg-white/5 disabled:text-white/20 transition-all active:scale-90 shadow-xl">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
-                </button>
+                <div className="flex items-center gap-3">
+                  {!hasStarted && (
+                    <button type="button" onClick={() => alert('this is under developement')} className="text-[10px] font-black text-white/30 hover:text-white/50 transition-all uppercase tracking-widest px-4">this is under developement</button>
+                  )}
+                  <button type="submit" disabled={!prompt.trim()} className="p-4 rounded-2xl bg-white text-black hover:bg-white/90 disabled:bg-white/5 disabled:text-white/20 transition-all active:scale-90 shadow-xl">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+                  </button>
+                </div>
               </div>
             </form>
 
@@ -364,7 +355,7 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* Pricing Section - v0 style */}
+        {/* Pricing Section */}
         <section ref={pricingRef} className="flex-shrink-0 px-6 md:px-8 py-32 md:py-40 bg-[#0a0a0a] border-t border-white/5">
           <div className="max-w-7xl mx-auto">
              <div className="text-center mb-24">
@@ -416,7 +407,7 @@ const App: React.FC = () => {
           </div>
         </section>
 
-        {/* FAQ Section - v0 style */}
+        {/* FAQ Section */}
         <section ref={faqRef} className="flex-shrink-0 px-6 md:px-8 py-32 md:py-40 bg-[#0a0a0a] border-t border-white/5">
           <div className="max-w-3xl mx-auto">
              <div className="text-center mb-20">
@@ -453,7 +444,7 @@ const App: React.FC = () => {
           <div className="flex items-center justify-center mx-auto mb-8 overflow-hidden">
             <BrandLogo className="w-20 h-20" />
           </div>
-          <p className="text-[10px] md:text-[11px] text-gray-700 uppercase tracking-[0.6em] font-black opacity-60 px-4">Powered by AcminX & {selectedModel.name} System</p>
+          <p className="text-[10px] md:text-[11px] text-gray-700 uppercase tracking-[0.6em] font-black opacity-60 px-4">Powered by AcminX & Logic Engine</p>
         </footer>
       </div>
     );
@@ -545,7 +536,7 @@ const App: React.FC = () => {
             <div className="text-[11px] font-black text-gray-500 bg-white/[0.04] px-5 py-2 rounded-xl border border-white/10 font-mono tracking-[0.2em] uppercase">
               ENGINE: <span className="text-white">{selectedModel.name}</span>
             </div>
-            <button onClick={handleComingSoon} className="px-5 py-2.5 bg-white text-black text-xs font-black rounded-xl hover:bg-gray-200 transition-all active:scale-95">SIGN UP</button>
+            <button onClick={() => alert('this is under developement')} className="px-5 py-2.5 bg-white text-black text-xs font-black rounded-xl hover:bg-gray-200 transition-all active:scale-95 uppercase">this is under developement</button>
           </div>
         </div>
 
