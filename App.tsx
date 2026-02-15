@@ -5,7 +5,7 @@ import Editor from './components/Editor';
 import Preview from './components/Preview';
 import Onboarding from './components/Onboarding';
 
-const BRAND_IMAGE_URL = "https://cdn.discordapp.com/attachments/1369330546811080836/1472193159382565096/1771068517646_1.png?ex=6991ae39&is=69905cb9&hm=8a4cb6811f0aa0e0a80e6688a2625191a3f6a8352c23f3acf18ec3dd744c65d1";
+const BRAND_IMAGE_URL = "https://ik.imagekit.io/QUlight/1771068517646_1.png";
 
 const BrandLogo = ({ className = "w-10 h-10" }) => (
   <img 
