@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { GeneratedCode, Message } from "../types";
 
@@ -27,20 +28,8 @@ You MUST return a valid JSON object matching this schema:
 }`;
 
 export const generateAppCode = async (prompt: string, history: Message[], model: string = "gemini-3-pro-preview"): Promise<GeneratedCode> => {
-  // Safe environment key access
-  const envKey = (typeof process !== 'undefined' && process.env?.API_KEY) || '';
-  
-  // Also check localStorage as a fallback if the user entered it in the UI
-  let apiKey = envKey;
-  if (!apiKey) {
-    try {
-      const saved = localStorage.getItem('acminx_api_keys');
-      const keys = saved ? JSON.parse(saved) : {};
-      if (keys.google) apiKey = keys.google;
-    } catch (e) {}
-  }
-
-  const ai = new GoogleGenAI({ apiKey: apiKey });
+  // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   try {
     const isThinkingModel = model.includes('gemini-3') || model.includes('gemini-2.5');
@@ -49,7 +38,7 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
       model: model, 
       contents: [
         ...history.map(m => ({ 
-          role: m.role === 'assistant' ? 'model' : m.role === 'system' ? 'user' : 'user', 
+          role: m.role === 'assistant' ? 'model' : 'user', 
           parts: [{ text: m.content }] 
         })),
         { role: 'user', parts: [{ text: prompt }] }
@@ -57,8 +46,7 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         responseMimeType: "application/json",
-        // Enable reasoning/thinking budget for models that support it to satisfy 
-        // the "check logic and fix problems before output" requirement.
+        // Only set thinkingBudget for supported Gemini 3/2.5 models
         ...(isThinkingModel ? { thinkingConfig: { thinkingBudget: 16000 } } : {}),
         responseSchema: {
           type: Type.OBJECT,
@@ -71,6 +59,7 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
       }
     });
 
+    // Access the .text property directly as per GenAI guidelines
     const text = response.text;
     if (!text) {
       throw new Error("The AI returned an empty response.");
@@ -85,12 +74,17 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
   } catch (error: any) {
     console.error("Gemini Generation Error:", error);
     
+    // Explicitly handle API key errors with helpful guidance
+    if (error?.message?.includes("API key not valid") || error?.message?.includes("key must be set")) {
+      throw new Error("API Key Error: Please ensure process.env.API_KEY is correctly configured in your deployment environment.");
+    }
+
     if (error?.message?.includes("429") || error?.message?.includes("RESOURCE_EXHAUSTED")) {
-      throw new Error("You’ve reached your usage limit. Please wait 10 minutes before trying again");
+      throw new Error("Rate limit exceeded. Please wait a moment before trying again.");
     }
 
     if (error?.message?.includes("500") || error?.message?.includes("Rpc failed")) {
-      throw new Error("The AI service is experiencing heavy load. Please try again in a few seconds.");
+      throw new Error("The Gemini service is currently under high load. Please retry in a few seconds.");
     }
     
     throw new Error(error.message || "An unexpected error occurred during generation.");

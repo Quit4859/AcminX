@@ -23,13 +23,6 @@ const MODELS = [
   { id: 'gemini-flash-lite-latest', name: 'AcminX-Lite', color: 'bg-blue-500' }
 ];
 
-const PROVIDERS = [
-  { id: 'google', name: 'Google Gemini', icon: '✨' },
-  { id: 'anthropic', name: 'Anthropic Claude', icon: '🧠' },
-  { id: 'openai', name: 'OpenAI GPT', icon: '🤖' },
-  { id: 'groq', name: 'Groq LPU', icon: '⚡' }
-];
-
 const PROMPT_TEMPLATES: Record<string, string> = {
   'Create Website': `Create a modern, responsive demo website with a clean and professional design that includes a navigation bar, hero section, about section, services section, and contact form, features smooth scrolling and basic animations, is fully responsive across desktop and mobile devices, uses consistent typography and color styling, and includes well-structured, semantic HTML, organized CSS, and clean JavaScript for interactivity.`,
   'Snake Game': `Create a fully functional Snake game where the player controls the snake using the WASD keys, the snake moves continuously across a grid, food appears randomly and causes the snake to grow and increase the score when eaten, the game ends if the snake collides with itself (and optionally the wall), a Game Over message and final score are displayed, and a restart button resets the game state, all presented with a clean, modern, and responsive design.`,
@@ -133,30 +126,6 @@ const App: React.FC = () => {
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isKeyManagerOpen, setIsKeyManagerOpen] = useState(false);
-  
-  // API Keys state with safety try-catch
-  const [apiKeys, setApiKeys] = useState<Record<string, string>>(() => {
-    try {
-      const saved = localStorage.getItem('acminx_api_keys');
-      return saved ? JSON.parse(saved) : {};
-    } catch (e) {
-      console.warn("Failed to load API keys from storage", e);
-      return {};
-    }
-  });
-  
-  const [connectedKeys, setConnectedKeys] = useState<Record<string, boolean>>(() => {
-    try {
-      const saved = localStorage.getItem('acminx_api_keys');
-      const keys = saved ? JSON.parse(saved) : {};
-      const connected: Record<string, boolean> = {};
-      Object.keys(keys).forEach(k => { if(keys[k]) connected[k] = true });
-      return connected;
-    } catch (e) {
-      return {};
-    }
-  });
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const templatesRef = useRef<HTMLDivElement>(null);
@@ -176,22 +145,6 @@ const App: React.FC = () => {
 
   const handleComingSoon = () => {
     alert("Coming Soon! We are currently in private beta. Stay tuned for our public launch.");
-  };
-
-  const handleKeyChange = (id: string, val: string) => {
-    setApiKeys(prev => ({ ...prev, [id]: val }));
-    setConnectedKeys(prev => ({ ...prev, [id]: false }));
-  };
-
-  const handleConnectKey = (id: string) => {
-    if (!apiKeys[id]) return;
-    const newConnected = { ...connectedKeys, [id]: true };
-    setConnectedKeys(newConnected);
-    try {
-      localStorage.setItem('acminx_api_keys', JSON.stringify(apiKeys));
-    } catch (e) {
-      console.error("Failed to save API keys", e);
-    }
   };
 
   const handleGenerate = async (e?: React.FormEvent, overridePrompt?: string) => {
@@ -589,63 +542,6 @@ const App: React.FC = () => {
           </div>
           
           <div className="flex items-center gap-6 relative">
-            {/* Key Manager Panel */}
-            <div className="relative">
-              <button 
-                onClick={() => setIsKeyManagerOpen(!isKeyManagerOpen)}
-                className={`flex items-center gap-2 text-[11px] font-black px-4 py-2 rounded-xl border transition-all ${isKeyManagerOpen ? 'bg-white text-black border-white shadow-xl shadow-white/5' : 'text-gray-500 bg-white/[0.04] border-white/10 hover:border-white/20'}`}
-              >
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/></svg>
-                KEYS
-              </button>
-
-              {isKeyManagerOpen && (
-                <div className="absolute top-full right-0 mt-4 w-72 bg-[#111]/95 backdrop-blur-2xl border border-white/10 rounded-[1.8rem] shadow-2xl p-6 z-50 animate-in fade-in slide-in-from-top-4 duration-300">
-                  <div className="flex items-center justify-between mb-6">
-                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">API Settings</h4>
-                    <button onClick={() => setIsKeyManagerOpen(false)} className="text-gray-600 hover:text-white transition-colors">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"/></svg>
-                    </button>
-                  </div>
-                  
-                  <div className="space-y-6">
-                    {PROVIDERS.map((provider) => (
-                      <div key={provider.id} className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <label className="text-[11px] font-bold text-gray-400 flex items-center gap-2">
-                            <span>{provider.icon}</span> {provider.name}
-                          </label>
-                          {connectedKeys[provider.id] && (
-                            <span className="text-[9px] font-black text-emerald-500 uppercase flex items-center gap-1">
-                              <div className="w-1 h-1 rounded-full bg-emerald-500"></div> Connected
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex gap-2">
-                          <input 
-                            type="password"
-                            value={apiKeys[provider.id] || ''}
-                            onChange={(e) => handleKeyChange(provider.id, e.target.value)}
-                            placeholder="Enter Key..."
-                            className="flex-1 bg-white/[0.04] border border-white/10 rounded-xl px-4 py-2 text-xs outline-none focus:border-white/30 transition-all font-mono"
-                          />
-                          <button 
-                            onClick={() => handleConnectKey(provider.id)}
-                            className={`px-3 py-2 rounded-xl text-[10px] font-black transition-all ${connectedKeys[provider.id] ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-white text-black hover:bg-gray-200'}`}
-                          >
-                            {connectedKeys[provider.id] ? '✓' : 'CONNECT'}
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-6 pt-6 border-t border-white/5">
-                    <p className="text-[9px] text-gray-600 leading-relaxed italic">Keys are stored locally in your browser and never shared with our servers.</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
             <div className="text-[11px] font-black text-gray-500 bg-white/[0.04] px-5 py-2 rounded-xl border border-white/10 font-mono tracking-[0.2em] uppercase">
               ENGINE: <span className="text-white">{selectedModel.name}</span>
             </div>
