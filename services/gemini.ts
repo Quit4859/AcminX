@@ -27,10 +27,11 @@ You MUST return a valid JSON object matching this schema:
 }`;
 
 export const generateAppCode = async (prompt: string, history: Message[], model: string = "gemini-3-pro-preview"): Promise<GeneratedCode> => {
-  // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  
   try {
+    // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+    // Initialization moved inside try to catch library-level initialization errors
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
+    
     const isThinkingModel = model.includes('gemini-3') || model.includes('gemini-2.5');
     
     const response = await ai.models.generateContent({
@@ -76,10 +77,11 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
     const msg = error?.message || "";
     
     // Explicitly handle API key errors and rename as requested by user
+    // This catches variations like "An API Key must be set when running in a browser"
     if (
       msg.toLowerCase().includes("api key must be set") || 
-      msg.includes("key must be set") || 
-      msg.includes("API key not valid") ||
+      msg.toLowerCase().includes("key must be set") || 
+      msg.toLowerCase().includes("api key not valid") ||
       msg.includes("API_KEY")
     ) {
       throw new Error("this is under Development");
@@ -90,7 +92,7 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
     }
 
     if (msg.includes("500") || msg.includes("Rpc failed")) {
-      throw new Error("The Gemini service is currently under high load. Please retry in a few seconds.");
+      throw new Error("The Acminx service is currently under high load. Please retry in a few seconds.");
     }
     
     throw new Error(msg || "An unexpected error occurred during generation.");
