@@ -27,10 +27,10 @@ You MUST return a valid JSON object matching this schema:
 }`;
 
 export const generateAppCode = async (prompt: string, history: Message[], model: string = "gemini-3-pro-preview"): Promise<GeneratedCode> => {
-  // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  
   try {
+    // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    
     const isThinkingModel = model.includes('gemini-3') || model.includes('gemini-2.5');
     
     const response = await ai.models.generateContent({
@@ -73,19 +73,27 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
   } catch (error: any) {
     console.error("Gemini Generation Error:", error);
     
+    const errorMessage = error?.message || "";
+    
     // Explicitly handle API key errors with the requested message
-    if (error?.message?.includes("API key not valid") || error?.message?.includes("key must be set") || error?.message?.includes("API_KEY")) {
-      throw new Error("this is under developement");
+    // Catches "An API Key must be set when running in a browser" and variations
+    if (
+      errorMessage.toLowerCase().includes("api key must be set") || 
+      errorMessage.toLowerCase().includes("api key not valid") || 
+      errorMessage.toLowerCase().includes("key must be set") || 
+      errorMessage.includes("API_KEY")
+    ) {
+      throw new Error("this is under Development");
     }
 
-    if (error?.message?.includes("429") || error?.message?.includes("RESOURCE_EXHAUSTED")) {
+    if (errorMessage.includes("429") || errorMessage.includes("RESOURCE_EXHAUSTED")) {
       throw new Error("Rate limit exceeded. Please wait a moment before trying again.");
     }
 
-    if (error?.message?.includes("500") || error?.message?.includes("Rpc failed")) {
+    if (errorMessage.includes("500") || errorMessage.includes("Rpc failed")) {
       throw new Error("The Gemini service is currently under high load. Please retry in a few seconds.");
     }
     
-    throw new Error(error.message || "An unexpected error occurred during generation.");
+    throw new Error(errorMessage || "An unexpected error occurred during generation.");
   }
 };

@@ -144,7 +144,7 @@ const App: React.FC = () => {
   }, [history, hasStarted]);
 
   const handleComingSoon = () => {
-    alert("Coming Soon! We are currently in private beta. Stay tuned for our public launch.");
+    alert("this is under Development");
   };
 
   const handleGenerate = async (e?: React.FormEvent, overridePrompt?: string) => {
@@ -289,7 +289,7 @@ const App: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-3">
                   {!hasStarted && (
-                    <button type="button" onClick={() => alert('this is under developement')} className="text-[10px] font-black text-white/30 hover:text-white/50 transition-all uppercase tracking-widest px-4">this is under developement</button>
+                    <button type="button" onClick={handleComingSoon} className="text-[10px] font-black text-white/30 hover:text-white/50 transition-all uppercase tracking-widest px-4">this is under Development</button>
                   )}
                   <button type="submit" disabled={!prompt.trim()} className="p-4 rounded-2xl bg-white text-black hover:bg-white/90 disabled:bg-white/5 disabled:text-white/20 transition-all active:scale-90 shadow-xl">
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
@@ -401,7 +401,7 @@ const App: React.FC = () => {
                         <li key={f} className="flex items-center gap-3 text-sm text-gray-400"><svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"/></svg>{f}</li>
                       ))}
                    </ul>
-                   <button className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-all">Contact Sales</button>
+                   <button onClick={handleComingSoon} className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 font-bold hover:bg-white/10 transition-all">Contact Sales</button>
                 </div>
              </div>
           </div>
@@ -536,7 +536,7 @@ const App: React.FC = () => {
             <div className="text-[11px] font-black text-gray-500 bg-white/[0.04] px-5 py-2 rounded-xl border border-white/10 font-mono tracking-[0.2em] uppercase">
               ENGINE: <span className="text-white">{selectedModel.name}</span>
             </div>
-            <button onClick={() => alert('this is under developement')} className="px-5 py-2.5 bg-white text-black text-xs font-black rounded-xl hover:bg-gray-200 transition-all active:scale-95 uppercase">this is under developement</button>
+            <button onClick={handleComingSoon} className="px-5 py-2.5 bg-white text-black text-xs font-black rounded-xl hover:bg-gray-200 transition-all active:scale-95 uppercase">this is under Development</button>
           </div>
         </div>
 
