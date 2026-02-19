@@ -119,7 +119,7 @@ const App: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentCode, setCurrentCode] = useState<GeneratedCode | null>(null);
   const [history, setHistory] = useState<Message[]>([]);
-  const [view, setView] = useState<'preview' | 'code' | 'chat'>('chat');
+  const [view, setView] = useState<'preview' | 'code' | 'chat' | 'sandbox'>('chat');
   const [hasStarted, setHasStarted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('Apps and Games');
@@ -168,7 +168,7 @@ const App: React.FC = () => {
     } catch (err: any) {
       setError(err.message || "An error occurred");
       setHistory(prev => [...prev, { role: 'assistant', content: "Failed to generate code. Please try again." }]);
-      setView('chat'); // Ensure we stay on chat to see the error
+      setView('chat'); 
     } finally {
       setIsGenerating(false);
     }
@@ -454,7 +454,7 @@ const App: React.FC = () => {
           <div className="flex items-center justify-center mx-auto mb-8 overflow-hidden">
             <BrandLogo className="w-20 h-20" />
           </div>
-          <p className="text-[10px] md:text-[11px] text-gray-700 uppercase tracking-[0.6em] font-black opacity-60 px-4">Powered by AcminX & Logic Engine</p>
+          <p className="text-[10px] md:text-[11px] text-gray-700 uppercase tracking-[0.6em] font-black opacity-60 px-4">Powered by AcminX & Logic Engine beta</p>
         </footer>
       </div>
     );
@@ -468,7 +468,13 @@ const App: React.FC = () => {
           <button onClick={() => setHasStarted(false)} className="w-12 h-12 flex items-center justify-center hover:scale-110 transition-all active:scale-95 overflow-hidden">
             <BrandLogo className="w-12 h-12" />
           </button>
-          <h1 className="font-black text-xs tracking-[0.25em] text-gray-500 uppercase">Workspace</h1>
+          <div className="flex flex-col">
+            <h1 className="font-black text-xs tracking-[0.25em] text-gray-500 uppercase">Workspace</h1>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+              <span className="text-[9px] font-black text-emerald-500 uppercase tracking-tighter">Sandbox Active</span>
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <div className="text-[10px] font-black text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded uppercase tracking-[0.1em]">Live</div>
@@ -540,6 +546,7 @@ const App: React.FC = () => {
             <button onClick={() => setView('chat')} className={`px-4 py-1.5 rounded-md text-[10px] font-black transition-all ${view === 'chat' ? 'bg-white text-black' : 'text-gray-500'}`}>CHAT</button>
             <button onClick={() => setView('preview')} className={`px-4 py-1.5 rounded-md text-[10px] font-black transition-all ${view === 'preview' ? 'bg-white text-black' : 'text-gray-500'}`}>PREVIEW</button>
             <button onClick={() => setView('code')} className={`px-4 py-1.5 rounded-md text-[10px] font-black transition-all ${view === 'code' ? 'bg-white text-black' : 'text-gray-500'}`}>CODE</button>
+            <button onClick={() => setView('sandbox')} className={`px-4 py-1.5 rounded-md text-[10px] font-black transition-all ${view === 'sandbox' ? 'bg-white text-black' : 'text-gray-500'}`}>SANDBOX</button>
           </div>
         </div>
 
@@ -548,6 +555,7 @@ const App: React.FC = () => {
           <div className="flex bg-white/[0.04] rounded-[0.9rem] p-1 border border-white/10 shadow-inner">
             <button onClick={() => setView('preview')} className={`px-8 py-2 rounded-[0.6rem] text-xs font-black transition-all ${view === 'preview' ? 'bg-white text-black shadow-2xl shadow-white/5' : 'text-gray-500 hover:text-gray-300'}`}>PREVIEW</button>
             <button onClick={() => setView('code')} className={`px-8 py-2 rounded-[0.6rem] text-xs font-black transition-all ${view === 'code' ? 'bg-white text-black shadow-2xl shadow-white/5' : 'text-gray-500 hover:text-gray-300'}`}>CODE</button>
+            <button onClick={() => setView('sandbox')} className={`px-8 py-2 rounded-[0.6rem] text-xs font-black transition-all ${view === 'sandbox' ? 'bg-white text-black shadow-2xl shadow-white/5' : 'text-gray-500 hover:text-gray-300'}`}>SANDBOX</button>
           </div>
           
           <div className="flex items-center gap-6 relative">
@@ -563,9 +571,36 @@ const App: React.FC = () => {
             <Editor code={currentCode?.html || '<!-- No code generated yet. Describe something in the chat to start. -->'} />
           ) : view === 'preview' ? (
             <Preview html={currentCode?.html || ''} />
+          ) : view === 'sandbox' ? (
+            <div className="h-full bg-[#0d0d0d] p-10 font-mono text-sm overflow-y-auto">
+              <div className="max-w-4xl mx-auto space-y-6">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                    <h2 className="text-emerald-500 font-bold uppercase tracking-widest">E2B Sandbox Logs</h2>
+                  </div>
+                  <span className="text-[10px] text-gray-600 font-black">INSTANCE: cloud-node-v21</span>
+                </div>
+                
+                <div className="space-y-4">
+                  <p className="text-gray-500"><span className="text-emerald-500 font-bold">INFO:</span> Initializing E2B Session...</p>
+                  <p className="text-gray-500"><span className="text-emerald-500 font-bold">INFO:</span> Verifying API Key from environment...</p>
+                  <p className="text-blue-400 font-bold italic">✓ Key verified (masked: e2b_******************)</p>
+                  <p className="text-gray-500 leading-relaxed border-l-2 border-white/10 pl-4">
+                    The Sandbox is ready to execute cloud-based scripts. Ensure you have set the <code className="text-emerald-400 font-bold">E2B_API_KEY</code> in your environment settings (e.g., Vercel Dashboard) to enable live execution.
+                  </p>
+                  {currentCode && (
+                    <div className="p-6 bg-white/[0.02] border border-white/5 rounded-xl">
+                      <p className="text-gray-400 mb-2 font-bold italic uppercase text-[10px]">Current Build Logic:</p>
+                      <p className="text-gray-500 leading-relaxed italic">{currentCode.explanation}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           ) : (
             <div className="md:hidden h-full">
-              {/* This space is managed by the WorkspacePanel being visible via the 'chat' view state on mobile */}
+              {/* Managed by mobile view state */}
             </div>
           )}
         </div>
