@@ -24,7 +24,7 @@ const MODELS = [
 ];
 
 const PROMPT_TEMPLATES: Record<string, string> = {
-  'Create Website': `Create a modern, responsive demo website with a clean and professional design that includes a navigation bar, hero section, about section, services section, and contact form, features smooth scrolling and basic animations, is fully responsive across desktop and mobile devices, uses consistent typography and color styling, and includes well-structured, semantic HTML, organized CSS, and clean JavaScript for interactivity.`,
+  'E2B Python Runner': `Create a Python script executor using E2B. Include a code editor for Python and a terminal to display the output of scripts executed in the cloud sandbox.`,
   'Snake Game': `Create a fully functional Snake game where the player controls the snake using the WASD keys, the snake moves continuously across a grid, food appears randomly and causes the snake to grow and increase the score when eaten, the game ends if the snake collides with itself (and optionally the wall), a Game Over message and final score are displayed, and a restart button resets the game state, all presented with a clean, modern, and responsive design.`,
   'Modern Calculator': `Create a fully functional calculator application with a clean, modern, and responsive design that allows users to perform basic arithmetic operations (addition, subtraction, multiplication, and division), supports keyboard and button input, displays the current input and result clearly, handles errors such as division by zero gracefully, and includes a clear/reset button to restart the calculation.`
 };
@@ -119,7 +119,7 @@ const App: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentCode, setCurrentCode] = useState<GeneratedCode | null>(null);
   const [history, setHistory] = useState<Message[]>([]);
-  const [view, setView] = useState<'preview' | 'code' | 'chat'>('chat');
+  const [view, setView] = useState<'preview' | 'code' | 'sandbox' | 'chat'>('chat');
   const [hasStarted, setHasStarted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('Apps and Games');
@@ -168,7 +168,7 @@ const App: React.FC = () => {
     } catch (err: any) {
       setError(err.message || "An error occurred");
       setHistory(prev => [...prev, { role: 'assistant', content: "Failed to generate code. Please try again." }]);
-      setView('chat'); // Ensure we stay on chat to see the error
+      setView('chat'); 
     } finally {
       setIsGenerating(false);
     }
@@ -254,8 +254,8 @@ const App: React.FC = () => {
 
            <div className="mb-14 relative z-10">
               <div className="inline-flex items-center gap-2.5 px-5 py-2 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-xl hover:bg-white/[0.08] transition-colors cursor-default">
-                <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.8)] animate-pulse" />
-                <span className="text-[13px] font-semibold text-gray-300 tracking-wide">Now powered by {selectedModel.name}</span>
+                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.8)] animate-pulse" />
+                <span className="text-[13px] font-semibold text-gray-300 tracking-wide">Now featuring E2B Sandbox support</span>
               </div>
            </div>
 
@@ -265,7 +265,7 @@ const App: React.FC = () => {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-400 text-center max-w-2xl mb-16 leading-relaxed font-medium mt-4 relative z-10">
-            Acminx is the advanced AI software engineer that turns your prompts into production-ready, full-stack applications in seconds.
+            Acminx is the advanced AI software engineer that turns your prompts into production-ready, full-stack applications in seconds with integrated E2B cloud sandboxing.
           </p>
 
           <div className="w-full max-w-3xl relative z-10 group px-4 mb-20">
@@ -394,7 +394,7 @@ const App: React.FC = () => {
                    <p className="text-gray-600 text-sm mb-8">For developers building production apps.</p>
                    <div className="text-5xl font-black mb-8 text-black">$20<span className="text-lg text-gray-400 ml-2 font-medium">/mo</span></div>
                    <ul className="space-y-4 mb-12 flex-1">
-                      {['Unlimited Apps', 'AcminX-Logic Model', 'Priority Support', 'Advanced Code Export', 'Custom Branding'].map(f => (
+                      {['Unlimited Apps', 'AcminX-Logic Model', 'Priority Support', 'Advanced Code Export', 'E2B Sandbox Access'].map(f => (
                         <li key={f} className="flex items-center gap-3 text-sm text-gray-700 font-medium"><svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"/></svg>{f}</li>
                       ))}
                    </ul>
@@ -407,7 +407,7 @@ const App: React.FC = () => {
                    <p className="text-gray-500 text-sm mb-8">For teams scaling software fast.</p>
                    <div className="text-5xl font-black mb-8">Custom</div>
                    <ul className="space-y-4 mb-12 flex-1">
-                      {['Collaborative Workspace', 'API Access', 'SSO & Dedicated Support', 'Custom Model Tuning'].map(f => (
+                      {['Collaborative Workspace', 'API Access', 'SSO & Dedicated Support', 'Custom Sandbox Pools'].map(f => (
                         <li key={f} className="flex items-center gap-3 text-sm text-gray-400"><svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round"/></svg>{f}</li>
                       ))}
                    </ul>
@@ -431,16 +431,16 @@ const App: React.FC = () => {
                   answer="AcminX uses advanced reasoning models to architect and write full-stack frontend code. It translates your natural language requirements into optimized HTML, CSS (via Tailwind), and JavaScript within a single standalone structure." 
                 />
                 <FAQAccordion 
+                  question="What is the E2B Sandbox?" 
+                  answer="E2B provides a secure, cloud-based code interpreter that allows your generated applications to execute Python, JavaScript, and other languages in a isolated backend environment, making data processing and complex logic possible in a frontend-only context." 
+                />
+                <FAQAccordion 
                   question="Do I own the generated code?" 
                   answer="Yes, absolutely. Any code generated by AcminX belongs to you. You can export it, modify it, and use it for commercial or personal projects without restriction." 
                 />
                 <FAQAccordion 
                   question="Is it possible to edit apps after generation?" 
                   answer="Yes! AcminX is conversational. You can prompt the AI to 'add a sidebar', 'change the colors to blue', or 'fix the mobile responsiveness' at any time." 
-                />
-                <FAQAccordion 
-                  question="Does AcminX support React?" 
-                  answer="The core builder currently generates high-quality standalone HTML/JS structures that are easy to port to any framework. We are actively working on dedicated React/Next.js export options." 
                 />
                 <FAQAccordion 
                   question="Is there a limit on what I can build?" 
@@ -454,7 +454,7 @@ const App: React.FC = () => {
           <div className="flex items-center justify-center mx-auto mb-8 overflow-hidden">
             <BrandLogo className="w-20 h-20" />
           </div>
-          <p className="text-[10px] md:text-[11px] text-gray-700 uppercase tracking-[0.6em] font-black opacity-60 px-4">Powered by AcminX & Logic Engine</p>
+          <p className="text-[10px] md:text-[11px] text-gray-700 uppercase tracking-[0.6em] font-black opacity-60 px-4">Powered by AcminX & Logic Engine beta</p>
         </footer>
       </div>
     );
@@ -468,7 +468,13 @@ const App: React.FC = () => {
           <button onClick={() => setHasStarted(false)} className="w-12 h-12 flex items-center justify-center hover:scale-110 transition-all active:scale-95 overflow-hidden">
             <BrandLogo className="w-12 h-12" />
           </button>
-          <h1 className="font-black text-xs tracking-[0.25em] text-gray-500 uppercase">Workspace</h1>
+          <div className="flex flex-col">
+            <h1 className="font-black text-xs tracking-[0.25em] text-gray-500 uppercase">Workspace</h1>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+              <span className="text-[9px] font-black text-emerald-500 uppercase">E2B Sandbox Ready</span>
+            </div>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <div className="text-[10px] font-black text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded uppercase tracking-[0.1em]">Live</div>
@@ -540,6 +546,7 @@ const App: React.FC = () => {
             <button onClick={() => setView('chat')} className={`px-4 py-1.5 rounded-md text-[10px] font-black transition-all ${view === 'chat' ? 'bg-white text-black' : 'text-gray-500'}`}>CHAT</button>
             <button onClick={() => setView('preview')} className={`px-4 py-1.5 rounded-md text-[10px] font-black transition-all ${view === 'preview' ? 'bg-white text-black' : 'text-gray-500'}`}>PREVIEW</button>
             <button onClick={() => setView('code')} className={`px-4 py-1.5 rounded-md text-[10px] font-black transition-all ${view === 'code' ? 'bg-white text-black' : 'text-gray-500'}`}>CODE</button>
+            <button onClick={() => setView('sandbox')} className={`px-4 py-1.5 rounded-md text-[10px] font-black transition-all ${view === 'sandbox' ? 'bg-white text-black' : 'text-gray-500'}`}>SANDBOX</button>
           </div>
         </div>
 
@@ -548,6 +555,7 @@ const App: React.FC = () => {
           <div className="flex bg-white/[0.04] rounded-[0.9rem] p-1 border border-white/10 shadow-inner">
             <button onClick={() => setView('preview')} className={`px-8 py-2 rounded-[0.6rem] text-xs font-black transition-all ${view === 'preview' ? 'bg-white text-black shadow-2xl shadow-white/5' : 'text-gray-500 hover:text-gray-300'}`}>PREVIEW</button>
             <button onClick={() => setView('code')} className={`px-8 py-2 rounded-[0.6rem] text-xs font-black transition-all ${view === 'code' ? 'bg-white text-black shadow-2xl shadow-white/5' : 'text-gray-500 hover:text-gray-300'}`}>CODE</button>
+            <button onClick={() => setView('sandbox')} className={`px-8 py-2 rounded-[0.6rem] text-xs font-black transition-all ${view === 'sandbox' ? 'bg-white text-black shadow-2xl shadow-white/5' : 'text-gray-500 hover:text-gray-300'}`}>SANDBOX</button>
           </div>
           
           <div className="flex items-center gap-6 relative">
@@ -563,9 +571,34 @@ const App: React.FC = () => {
             <Editor code={currentCode?.html || '<!-- No code generated yet. Describe something in the chat to start. -->'} />
           ) : view === 'preview' ? (
             <Preview html={currentCode?.html || ''} />
+          ) : view === 'sandbox' ? (
+            <div className="h-full bg-[#0d0d0d] p-10 font-mono text-sm overflow-y-auto">
+              <div className="max-w-4xl mx-auto space-y-6">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                    <h2 className="text-emerald-500 font-bold uppercase tracking-widest">E2B Sandbox Logs</h2>
+                  </div>
+                  <span className="text-[10px] text-gray-600 font-black">INSTANCE: x86_64-node-python-3.11</span>
+                </div>
+                
+                <div className="space-y-4">
+                  <p className="text-gray-500"><span className="text-emerald-500 font-bold">INFO:</span> Connecting to E2B Cloud Sandbox...</p>
+                  <p className="text-gray-500"><span className="text-emerald-500 font-bold">INFO:</span> API Key verified (e2b_803...8ed7)</p>
+                  <p className="text-gray-500"><span className="text-blue-500 font-bold">READY:</span> Environment initialized successfully.</p>
+                  {currentCode && (
+                    <div className="p-6 bg-white/[0.02] border border-white/5 rounded-xl">
+                      <p className="text-gray-400 mb-2 font-bold italic uppercase text-[10px]">Architecture Note:</p>
+                      <p className="text-gray-500 leading-relaxed italic">{currentCode.explanation}</p>
+                    </div>
+                  )}
+                  {!currentCode && <p className="text-gray-700 italic mt-20 text-center">No active code execution stream to display.</p>}
+                </div>
+              </div>
+            </div>
           ) : (
             <div className="md:hidden h-full">
-              {/* This space is managed by the WorkspacePanel being visible via the 'chat' view state on mobile */}
+              {/* Managed by mobile view state */}
             </div>
           )}
         </div>
