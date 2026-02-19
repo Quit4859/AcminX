@@ -1,16 +1,8 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { GeneratedCode, Message } from "../types";
 
-const E2B_API_KEY = "e2b_80347a39c5b76a06d239bd173e863243473e8ed7";
-
 const SYSTEM_INSTRUCTION = `You are an elite software architect and senior frontend engineer. 
 Your goal is to build flawless, production-ready, standalone web applications based on user prompts.
-
-### SANDBOX CAPABILITY (E2B):
-- You have access to the E2B Sandbox for cloud-based code execution.
-- If the user requires running Python or complex JavaScript that needs a backend environment, you can architect the solution to use the E2B Code Interpreter SDK.
-- SDK URL: https://esm.sh/@e2b/code-interpreter@1.0.1
-- Use the API Key: '${E2B_API_KEY}' for any sandboxed execution logic within the generated code.
 
 ### EXECUTION PROCESS:
 1. ANALYZE: Carefully parse the user's request, identifying all functional and non-functional requirements.
@@ -37,6 +29,7 @@ You MUST return a valid JSON object matching this schema:
 export const generateAppCode = async (prompt: string, history: Message[], model: string = "gemini-3-pro-preview"): Promise<GeneratedCode> => {
   try {
     // The API key must be obtained exclusively from the environment variable process.env.API_KEY.
+    // Initialization moved inside try to catch library-level initialization errors
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || "" });
     
     const isThinkingModel = model.includes('gemini-3') || model.includes('gemini-2.5');
@@ -48,11 +41,12 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
           role: m.role === 'assistant' ? 'model' : 'user', 
           parts: [{ text: m.content }] 
         })),
-        { role: 'user', parts: [{ text: `Task: Generate an application. Available E2B API Key: ${E2B_API_KEY}. User Prompt: ${prompt}` }] }
+        { role: 'user', parts: [{ text: prompt }] }
       ],
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         responseMimeType: "application/json",
+        // Only set thinkingBudget for supported Gemini 3/2.5 models
         ...(isThinkingModel ? { thinkingConfig: { thinkingBudget: 16000 } } : {}),
         responseSchema: {
           type: Type.OBJECT,
@@ -65,6 +59,7 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
       }
     });
 
+    // Access the .text property directly as per GenAI guidelines
     const text = response.text;
     if (!text) {
       throw new Error("The AI returned an empty response.");
@@ -81,6 +76,8 @@ export const generateAppCode = async (prompt: string, history: Message[], model:
     
     const msg = error?.message || "";
     
+    // Explicitly handle API key errors and rename as requested by user
+    // This catches variations like "An API Key must be set when running in a browser"
     if (
       msg.toLowerCase().includes("api key must be set") || 
       msg.toLowerCase().includes("key must be set") || 

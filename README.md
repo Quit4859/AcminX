@@ -34,7 +34,7 @@ The project is structured as a standalone React application using ESM modules fo
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Quit4859/AcminX.git
+   git clone https://github.com/firecrawl/open-lovable.git
    ```
 2. Serve the root directory using any local web server (e.g., `npx serve .`).
 3. Ensure your `process.env.API_KEY` is configured to access the generation features.
