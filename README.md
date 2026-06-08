@@ -1,5 +1,4 @@
-# 🚀 AcminX: The Intelligent AI App Builder........
-
+# 🚀 AcminX: The Intelligent AI App Builder.......
 AcminX is an advanced AI-powered software engineering platform that transforms natural language prompts into production-ready, standalone web applications instantly. Powered by the latest Gemini 3 models, AcminX handles everything from architecture planning to UI design and logic implementation.
 
 ![AcminX Logo](https://ik.imagekit.io/QUlight/1771068517646_1.png)
